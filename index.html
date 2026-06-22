@@ -97,16 +97,16 @@
                     <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-2">Automation</p>
                     <div class="space-y-1">
                         <button onclick="switchTab('broadcast')" id="nav-broadcast" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:bg-slate-800 hover:text-white relative overflow-hidden group">
-                            <i class="ph-fill ph-megaphone text-lg text-blue-500"></i> 
-                            <span class="group-hover:text-blue-400 transition-colors">Broadcast WA</span>
-                            <span class="ml-auto bg-blue-500/20 text-blue-400 text-[9px] font-bold px-1.5 py-0.5 rounded">NEW</span>
+                            <i class="ph-fill ph-rocket-launch text-lg text-blue-500"></i> 
+                            <span class="group-hover:text-blue-400 transition-colors">Campaign Center</span>
+                            <span class="ml-auto bg-blue-500/20 text-blue-400 text-[9px] font-bold px-1.5 py-0.5 rounded">V4</span>
                         </button>
                         <button onclick="switchTab('sequence')" id="nav-sequence" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:bg-slate-800 hover:text-white relative overflow-hidden group">
                             <i class="ph-fill ph-paper-plane-right text-lg text-emerald-500"></i> 
                             <span class="group-hover:text-emerald-400 transition-colors">Sequence WA</span>
                         </button>
                         <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all hover:bg-slate-800 hover:text-white">
-                            <i class="ph-fill ph-plugs-connected text-lg"></i> Pengaturan
+                            <i class="ph-fill ph-plugs-connected text-lg"></i> Integrasi API
                         </button>
                     </div>
                 </div>
@@ -205,138 +205,199 @@
                     </div>
                 </div>
 
-                <!-- VIEW: BROADCAST WA -->
+                <!-- VIEW: BROADCAST WA (CAMPAIGN CENTER) -->
                 <div id="view-broadcast" class="hidden animate-fade-in max-w-6xl mx-auto pb-10 flex flex-col min-h-full">
-                    <div class="mb-6 border-b border-slate-200 pb-4">
-                        <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                            <i class="ph-fill ph-megaphone text-blue-500"></i> Broadcast WA (Blasting)
-                        </h1>
-                        <p class="text-slate-500 text-sm mt-1">Kirim pesan massal ke prospek Anda dengan 3 pilihan mode keamanan tinggi.</p>
+                    <div class="mb-6 border-b border-slate-200 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                                <i class="ph-fill ph-rocket-launch text-blue-500"></i> Campaign Center
+                            </h1>
+                            <p class="text-slate-500 text-sm mt-1">Kelola aset broadcast, riwayat pengiriman, dan jalankan campaign baru.</p>
+                        </div>
+                        <button onclick="toggleCampaignView('create')" id="btn-new-campaign" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 flex-shrink-0">
+                            <i class="ph-bold ph-plus"></i> Buat Campaign Baru
+                        </button>
                     </div>
 
-                    <div class="flex flex-col lg:flex-row gap-6 items-start">
-                        <!-- Panel Kiri: Setup & Editor -->
-                        <div class="flex-1 w-full flex flex-col gap-5">
-                            <!-- 1. Sumber Data -->
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                                <h3 class="font-bold text-slate-800 text-sm mb-3">1. Sumber Data (Kontak)</h3>
-                                <div class="flex gap-4 mb-4">
-                                    <label class="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                                        <input type="radio" name="bc_source" value="csv" class="w-4 h-4 text-blue-600 accent-blue-600" checked onchange="toggleBcSource()"> Upload CSV / Copas Text
-                                    </label>
-                                    <label class="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                                        <input type="radio" name="bc_source" value="form" class="w-4 h-4 text-blue-600 accent-blue-600" onchange="toggleBcSource()"> Data Leads Form
-                                    </label>
-                                </div>
-                                
-                                <div id="bc-source-csv-box" class="space-y-3">
-                                    <div class="flex gap-2">
-                                        <label class="flex-1 cursor-pointer bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-md">
-                                            <i class="ph-bold ph-upload-simple text-lg"></i> 📂 Pilih File .CSV
-                                            <input type="file" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
-                                        </label>
-                                        <button onclick="downloadDummyCSV()" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-sm">
-                                            <i class="ph-bold ph-download-simple text-lg"></i> Download Contoh CSV
-                                        </button>
-                                    </div>
-                                    <textarea id="bc-csv-data" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 font-mono custom-scrollbar resize-y h-32 leading-relaxed" placeholder="Budi, 08123456789&#10;Siti, 628987654321&#10;Atau langsung copas daftar nomor WA saja ke sini..."></textarea>
-                                    <p class="text-[10.5px] text-slate-500 mt-2 font-medium bg-slate-100 p-2 rounded-lg border border-slate-200">
-                                        💡 <b>Format:</b> Nama, No WA (Satu kontak per baris. Pemisah menggunakan koma). <br>Jika nama kosong, variabel [Nama] akan diganti otomatis menjadi "Kakak".
-                                    </p>
-                                </div>
-                                
-                                <div id="bc-source-form-box" class="hidden">
-                                    <select id="bc-form-target" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-blue-500 mb-2">
-                                        <option value="">-- Pilih Form Target --</option>
+                    <!-- CAMPAIGN LIST VIEW -->
+                    <div id="campaign-list-view" class="block">
+                        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                            <div class="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50">
+                                <h2 class="text-lg font-bold text-slate-800">Riwayat Campaign & Template</h2>
+                                <div class="flex items-center gap-3">
+                                    <select id="filter-campaign-folder" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium outline-none focus:border-blue-500 shadow-sm" onchange="renderCampaignHistory()">
+                                        <option value="ALL">Semua Folder</option>
                                     </select>
-                                    <p class="text-[11px] text-rose-600 bg-rose-50 p-3 rounded-lg border border-rose-200 font-medium leading-relaxed">
-                                        <i class="ph-bold ph-warning-circle"></i> Mode tarik otomatis dari Database Form sedang dalam tahap rilis di backend V4.0. Untuk sementara, gunakan fitur eksport CSV di Google Sheets lalu copas ke opsi <b>"Upload CSV"</b>.
-                                    </p>
+                                    <button onclick="syncCRMData()" class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition shadow-sm">
+                                        <i class="ph-bold ph-arrows-clockwise text-lg"></i>
+                                    </button>
                                 </div>
                             </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                        <tr>
+                                            <th class="px-6 py-4 w-12 text-center">⭐</th>
+                                            <th class="px-6 py-4">Nama Campaign</th>
+                                            <th class="px-6 py-4">Folder</th>
+                                            <th class="px-6 py-4">Target (Kategori)</th>
+                                            <th class="px-6 py-4 text-center">Total Kirim</th>
+                                            <th class="px-6 py-4 text-right">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="campaign-table-body" class="divide-y divide-slate-100 text-slate-700">
+                                        <tr><td colspan="6" class="px-6 py-12 text-center text-slate-500 font-medium">Memuat data Campaign...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
-                            <!-- 2. Editor Pesan -->
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                                <div class="mb-5">
-                                    <h3 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-2"><i class="ph-fill ph-link text-blue-500"></i> URL Media / Lampiran (Opsional)</h3>
-                                    <input type="text" id="bc-media-url" placeholder="https://domain.com/gambar.jpg" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm transition font-mono">
-                                    <p class="text-[10px] text-slate-500 mt-1.5 font-medium">Bisa diisi link valid untuk gambar (JPG/PNG), video (MP4), atau dokumen (PDF).</p>
-                                </div>
-
-                                <div class="pt-5 border-t border-slate-100 flex items-center justify-between mb-3">
-                                    <h3 class="font-bold text-slate-800 text-sm">Tulis Pesan Broadcast</h3>
-                                    <button onclick="insertBcFormat('[Nama]')" class="text-[10px] bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold px-2.5 py-1.5 rounded-lg border border-blue-100 transition shadow-sm">+ [Nama]</button>
-                                </div>
-                                <div class="border border-slate-200 rounded-xl overflow-hidden focus-within:border-blue-500 transition">
-                                    <div class="bg-slate-50 border-b border-slate-200 p-2 flex items-center justify-between">
-                                        <div class="flex gap-1">
-                                            <button onclick="insertBcFormat('*')" class="w-8 h-8 rounded hover:bg-slate-200 font-bold flex items-center justify-center text-slate-700">B</button>
-                                            <button onclick="insertBcFormat('_')" class="w-8 h-8 rounded hover:bg-slate-200 italic font-serif flex items-center justify-center text-slate-700">I</button>
-                                            <button onclick="insertBcFormat('~')" class="w-8 h-8 rounded hover:bg-slate-200 line-through flex items-center justify-center text-slate-700">S</button>
-                                        </div>
-                                    </div>
-                                    <textarea id="bc-editor" class="w-full h-44 p-4 text-sm outline-none resize-y custom-scrollbar leading-relaxed" placeholder="Halo [Nama], kami sedang ada promo spesial nih..."></textarea>
-                                </div>
+                    <!-- CAMPAIGN CREATE VIEW -->
+                    <div id="campaign-create-view" class="hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <button onclick="toggleCampaignView('list')" class="text-sm font-bold text-slate-600 hover:text-blue-600 transition flex items-center gap-2">
+                                <i class="ph-bold ph-arrow-left text-lg"></i> Kembali ke Riwayat
+                            </button>
+                        </div>
+                        
+                        <!-- Header Config Campaign -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-end">
+                            <div class="flex-1 w-full">
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase">Nama Campaign / Promo</label>
+                                <input type="text" id="bc-campaign-name" placeholder="Misal: Promo Flash Sale Spesial Lebaran" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm transition font-medium">
+                            </div>
+                            <div class="w-full md:w-64">
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase">Simpan ke Folder</label>
+                                <input type="text" id="bc-campaign-folder" placeholder="Misal: Promo Bulanan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm transition">
+                            </div>
+                            <div class="flex items-center gap-2 h-[42px] px-2">
+                                <input type="checkbox" id="bc-campaign-fav" class="w-5 h-5 text-amber-500 accent-amber-500 cursor-pointer">
+                                <label for="bc-campaign-fav" class="text-sm font-bold text-slate-700 cursor-pointer">Tandai Favorite ⭐</label>
                             </div>
                         </div>
 
-                        <!-- Panel Kanan: Metode & Eksekusi -->
-                        <div class="w-full lg:w-[400px] flex-shrink-0 flex flex-col gap-5">
-                            <!-- 3. Metode Pengiriman -->
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                                <h3 class="font-bold text-slate-800 text-sm mb-4">3. Pilih Metode Pengiriman</h3>
-                                <div class="space-y-3">
-                                    <!-- Opsi 1 (Queue) -->
-                                    <label class="relative flex cursor-pointer rounded-xl border border-slate-200 bg-white p-4 shadow-sm focus:outline-none hover:border-emerald-300 transition-all group">
-                                        <input type="radio" name="bc_method" value="queue" class="peer sr-only" checked>
-                                        <div class="peer-checked:border-emerald-500 peer-checked:ring-1 peer-checked:bg-emerald-50/20 absolute inset-0 rounded-xl border-2 border-transparent transition"></div>
-                                        <div class="relative z-10 flex gap-3">
-                                            <div class="mt-0.5 text-slate-300 group-hover:text-emerald-400 peer-checked:text-emerald-500 transition-colors"><i class="ph-fill ph-cloud-check text-2xl"></i></div>
-                                            <div>
-                                                <span class="block text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Antrean Latar Belakang</span>
-                                                <span class="mt-1 block text-[11px] text-slate-500 leading-relaxed">Paling direkomendasikan & aman. Pesan dikirim otomatis 15x tiap 5 menit. Laptop boleh dimatikan.</span>
+                        <div class="flex flex-col lg:flex-row gap-6 items-start">
+                            <!-- Panel Kiri: Setup & Editor -->
+                            <div class="flex-1 w-full flex flex-col gap-5">
+                                <!-- 1. Sumber Data -->
+                                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                    <h3 class="font-bold text-slate-800 text-sm mb-3">1. Target Kontak Broadcast</h3>
+                                    <div class="flex flex-wrap gap-4 mb-4">
+                                        <label class="flex items-center gap-2 text-sm font-medium cursor-pointer text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 hover:bg-emerald-100 transition">
+                                            <input type="radio" name="bc_source" value="crm" class="w-4 h-4 text-emerald-600 accent-emerald-600" checked onchange="toggleBcSource()"> 🎯 Smart CRM (Kategori)
+                                        </label>
+                                        <label class="flex items-center gap-2 text-sm font-medium cursor-pointer bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 transition">
+                                            <input type="radio" name="bc_source" value="csv" class="w-4 h-4 text-blue-600 accent-blue-600" onchange="toggleBcSource()"> 📂 Upload CSV Manual
+                                        </label>
+                                    </div>
+                                    
+                                    <div id="bc-source-crm-box" class="space-y-3 block">
+                                        <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                                            <label class="block text-xs font-bold text-emerald-800 mb-2 uppercase tracking-wider">Pilih Kategori / Tag Kontak</label>
+                                            <select id="bc-crm-tag" class="w-full px-4 py-2.5 bg-white border border-emerald-200 rounded-lg text-sm font-bold outline-none focus:border-emerald-500 shadow-sm">
+                                                <option value="ALL">Semua Kontak di Database</option>
+                                                <!-- Populated from master contacts -->
+                                            </select>
+                                            <p class="text-[10px] text-emerald-600 mt-2">Data ditarik otomatis secara realtime dari Tab Master_Kontak Google Sheets Anda.</p>
+                                        </div>
+                                    </div>
+
+                                    <div id="bc-source-csv-box" class="space-y-3 hidden">
+                                        <div class="flex gap-2">
+                                            <label class="flex-1 cursor-pointer bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-md">
+                                                <i class="ph-bold ph-upload-simple text-lg"></i> Pilih File .CSV
+                                                <input type="file" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
+                                            </label>
+                                            <button onclick="downloadDummyCSV()" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-sm">
+                                                <i class="ph-bold ph-download-simple text-lg"></i> Format CSV
+                                            </button>
+                                        </div>
+                                        <textarea id="bc-csv-data" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-500 font-mono custom-scrollbar resize-y h-32 leading-relaxed" placeholder="Budi, 08123456789&#10;Siti, 628987654321&#10;Atau langsung copas daftar nomor WA saja ke sini..."></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Editor Pesan -->
+                                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                    <div class="mb-5">
+                                        <h3 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-2"><i class="ph-fill ph-link text-blue-500"></i> URL Media / Lampiran (Opsional)</h3>
+                                        <input type="text" id="bc-media-url" placeholder="https://domain.com/gambar.jpg" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm transition font-mono">
+                                    </div>
+
+                                    <div class="pt-5 border-t border-slate-100 flex items-center justify-between mb-3">
+                                        <h3 class="font-bold text-slate-800 text-sm">Tulis Pesan Broadcast</h3>
+                                        <button onclick="insertBcFormat('[Nama]')" class="text-[10px] bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold px-2.5 py-1.5 rounded-lg border border-blue-100 transition shadow-sm">+ Variabel [Nama]</button>
+                                    </div>
+                                    <div class="border border-slate-200 rounded-xl overflow-hidden focus-within:border-blue-500 transition">
+                                        <div class="bg-slate-50 border-b border-slate-200 p-2 flex items-center justify-between">
+                                            <div class="flex gap-1">
+                                                <button onclick="insertBcFormat('*')" class="w-8 h-8 rounded hover:bg-slate-200 font-bold flex items-center justify-center text-slate-700">B</button>
+                                                <button onclick="insertBcFormat('_')" class="w-8 h-8 rounded hover:bg-slate-200 italic font-serif flex items-center justify-center text-slate-700">I</button>
+                                                <button onclick="insertBcFormat('~')" class="w-8 h-8 rounded hover:bg-slate-200 line-through flex items-center justify-center text-slate-700">S</button>
                                             </div>
                                         </div>
-                                    </label>
-                                    <!-- Opsi 2 (Live) -->
-                                    <label class="relative flex cursor-pointer rounded-xl border border-slate-200 bg-white p-4 shadow-sm focus:outline-none hover:border-blue-300 transition-all group">
-                                        <input type="radio" name="bc_method" value="live" class="peer sr-only">
-                                        <div class="peer-checked:border-blue-500 peer-checked:ring-1 peer-checked:bg-blue-50/20 absolute inset-0 rounded-xl border-2 border-transparent transition"></div>
-                                        <div class="relative z-10 flex gap-3">
-                                            <div class="mt-0.5 text-slate-300 group-hover:text-blue-400 peer-checked:text-blue-500 transition-colors"><i class="ph-fill ph-monitor-play text-2xl"></i></div>
-                                            <div>
-                                                <span class="block text-sm font-bold text-slate-900 group-hover:text-blue-700 transition-colors">Mode Live Browser</span>
-                                                <span class="mt-1 block text-[11px] text-slate-500 leading-relaxed">Eksekusi satu per satu dari halaman ini dengan jeda 3 detik. <span class="text-rose-500 font-bold">JANGAN tutup tab browser.</span></span>
-                                            </div>
-                                        </div>
-                                    </label>
-                                    <!-- Opsi 3 (Bulk) -->
-                                    <label class="relative flex cursor-pointer rounded-xl border border-slate-200 bg-white p-4 shadow-sm focus:outline-none hover:border-rose-300 transition-all group">
-                                        <input type="radio" name="bc_method" value="bulk" class="peer sr-only">
-                                        <div class="peer-checked:border-rose-500 peer-checked:ring-1 peer-checked:bg-rose-50/20 absolute inset-0 rounded-xl border-2 border-transparent transition"></div>
-                                        <div class="relative z-10 flex gap-3">
-                                            <div class="mt-0.5 text-slate-300 group-hover:text-rose-400 peer-checked:text-rose-500 transition-colors"><i class="ph-fill ph-lightning text-2xl"></i></div>
-                                            <div>
-                                                <span class="block text-sm font-bold text-slate-900 group-hover:text-rose-700 transition-colors">Tembak Instan (Bulk)</span>
-                                                <span class="mt-1 block text-[11px] text-rose-500 font-medium leading-relaxed">Risiko Tinggi! Mengirim semua ke Provider sekaligus. Fitur Variabel [Nama] tidak bekerja di mode ini.</span>
-                                            </div>
-                                        </div>
-                                    </label>
+                                        <textarea id="bc-editor" class="w-full h-44 p-4 text-sm outline-none resize-y custom-scrollbar leading-relaxed" placeholder="Halo [Nama], kami sedang ada promo spesial nih..."></textarea>
+                                    </div>
                                 </div>
                             </div>
 
-                            <button id="btn-bc-execute" onclick="processBroadcast()" class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-base">
-                                <i class="ph-bold ph-rocket-launch text-xl"></i> Mulai Broadcast Sekarang
-                            </button>
-
-                            <!-- Log Terminal Broadcast -->
-                            <div class="bg-slate-900 rounded-xl overflow-hidden shadow-lg border border-slate-800 flex flex-col h-48 mt-2">
-                                <div class="bg-slate-800 px-4 py-2.5 flex items-center gap-2 border-b border-slate-700">
-                                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
-                                    <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Terminal Log</span>
+                            <!-- Panel Kanan: Metode & Eksekusi -->
+                            <div class="w-full lg:w-[400px] flex-shrink-0 flex flex-col gap-5">
+                                <!-- 3. Metode Pengiriman -->
+                                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                    <h3 class="font-bold text-slate-800 text-sm mb-4">3. Pilih Metode Pengiriman</h3>
+                                    <div class="space-y-3">
+                                        <label class="relative flex cursor-pointer rounded-xl border border-slate-200 bg-white p-4 shadow-sm focus:outline-none hover:border-emerald-300 transition-all group">
+                                            <input type="radio" name="bc_method" value="queue" class="peer sr-only" checked>
+                                            <div class="peer-checked:border-emerald-500 peer-checked:ring-1 peer-checked:bg-emerald-50/20 absolute inset-0 rounded-xl border-2 border-transparent transition"></div>
+                                            <div class="relative z-10 flex gap-3">
+                                                <div class="mt-0.5 text-slate-300 group-hover:text-emerald-400 peer-checked:text-emerald-500 transition-colors"><i class="ph-fill ph-cloud-check text-2xl"></i></div>
+                                                <div>
+                                                    <span class="block text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Antrean Latar Belakang</span>
+                                                    <span class="mt-1 block text-[11px] text-slate-500 leading-relaxed">Paling aman. Pesan dikirim otomatis bertahap via Cron Job. Layar boleh ditutup.</span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                        <label class="relative flex cursor-pointer rounded-xl border border-slate-200 bg-white p-4 shadow-sm focus:outline-none hover:border-blue-300 transition-all group">
+                                            <input type="radio" name="bc_method" value="live" class="peer sr-only">
+                                            <div class="peer-checked:border-blue-500 peer-checked:ring-1 peer-checked:bg-blue-50/20 absolute inset-0 rounded-xl border-2 border-transparent transition"></div>
+                                            <div class="relative z-10 flex gap-3">
+                                                <div class="mt-0.5 text-slate-300 group-hover:text-blue-400 peer-checked:text-blue-500 transition-colors"><i class="ph-fill ph-monitor-play text-2xl"></i></div>
+                                                <div>
+                                                    <span class="block text-sm font-bold text-slate-900 group-hover:text-blue-700 transition-colors">Mode Live Browser</span>
+                                                    <span class="mt-1 block text-[11px] text-slate-500 leading-relaxed">Eksekusi satu per satu dari halaman ini. <span class="text-rose-500 font-bold">JANGAN tutup tab browser.</span></span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                        <label class="relative flex cursor-pointer rounded-xl border border-slate-200 bg-white p-4 shadow-sm focus:outline-none hover:border-rose-300 transition-all group">
+                                            <input type="radio" name="bc_method" value="bulk" class="peer sr-only">
+                                            <div class="peer-checked:border-rose-500 peer-checked:ring-1 peer-checked:bg-rose-50/20 absolute inset-0 rounded-xl border-2 border-transparent transition"></div>
+                                            <div class="relative z-10 flex gap-3">
+                                                <div class="mt-0.5 text-slate-300 group-hover:text-rose-400 peer-checked:text-rose-500 transition-colors"><i class="ph-fill ph-lightning text-2xl"></i></div>
+                                                <div>
+                                                    <span class="block text-sm font-bold text-slate-900 group-hover:text-rose-700 transition-colors">Tembak Instan (Bulk)</span>
+                                                    <span class="mt-1 block text-[11px] text-rose-500 font-medium leading-relaxed">Berisiko! Mengirim semua ke Provider sekaligus. Variabel [Nama] tidak bekerja.</span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
                                 </div>
-                                <div id="bc-log-output" class="flex-1 p-4 overflow-y-auto custom-scrollbar font-mono text-[11px] text-emerald-400 leading-relaxed space-y-1.5">
-                                    <span class="text-slate-500">Sistem siap... Menunggu eksekusi broadcast.</span>
+
+                                <div class="flex flex-col gap-3">
+                                    <button id="btn-bc-execute" onclick="processBroadcast()" class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-base">
+                                        <i class="ph-bold ph-rocket-launch text-xl"></i> Mulai Broadcast Sekarang
+                                    </button>
+                                </div>
+
+                                <!-- Log Terminal Broadcast -->
+                                <div class="bg-slate-900 rounded-xl overflow-hidden shadow-lg border border-slate-800 flex flex-col h-48 mt-2">
+                                    <div class="bg-slate-800 px-4 py-2.5 flex items-center gap-2 border-b border-slate-700">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+                                        <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Terminal Log</span>
+                                    </div>
+                                    <div id="bc-log-output" class="flex-1 p-4 overflow-y-auto custom-scrollbar font-mono text-[11px] text-emerald-400 leading-relaxed space-y-1.5">
+                                        <span class="text-slate-500">Sistem siap... Menunggu eksekusi broadcast.</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -367,7 +428,7 @@
                                     <h3 class="font-bold text-slate-800 text-sm">Timeline Pesan</h3>
                                     <div class="flex gap-2">
                                         <button onclick="openSequenceTemplateModal()" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-3 py-1.5 rounded-lg transition shadow-sm border border-blue-100 flex items-center gap-1.5">
-                                            <i class="ph-fill ph-magic-wand"></i> Pilih Template
+                                            <i class="ph-fill ph-magic-wand"></i> Load Template
                                         </button>
                                         <button onclick="addSequenceItem()" class="text-xs bg-slate-900 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-md">+ Tambah Jadwal</button>
                                     </div>
@@ -419,9 +480,14 @@
                                         <span class="text-xs font-bold text-slate-600">Berhenti otomatis jika Lunas</span>
                                     </label>
                                 </div>
-                                <button onclick="saveSequenceToServer()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition flex items-center justify-center gap-2 text-base">
-                                    <i class="ph-bold ph-floppy-disk text-lg"></i> Simpan Pesan Ini
-                                </button>
+                                <div class="flex flex-col sm:flex-row gap-2 border-t border-slate-100 bg-white p-3">
+                                    <button onclick="saveSequenceToServer()" class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition rounded-xl flex items-center justify-center gap-2 text-sm shadow-md">
+                                        <i class="ph-bold ph-floppy-disk text-lg"></i> Simpan Skenario Form Ini
+                                    </button>
+                                    <button onclick="savePersonalSeqTemplate()" class="px-6 py-4 bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold transition rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm border border-amber-200">
+                                        <i class="ph-bold ph-star text-lg"></i> Simpan Sbg Template Pribadi
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -982,11 +1048,14 @@
                                     <textarea id="output-code" class="flex-1 w-full bg-transparent text-emerald-400 p-6 font-mono text-[13px] leading-relaxed focus:outline-none resize-none custom-scrollbar" readonly></textarea>
                                 </div>
                                 <div class="flex flex-col sm:flex-row gap-4 mt-auto">
-                                    <button onclick="saveFormToDashboard()" class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-lg">
-                                        <i class="ph-bold ph-floppy-disk text-2xl"></i> Simpan & Publish Form
+                                    <button onclick="saveFormToDashboard()" class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm sm:text-lg">
+                                        <i class="ph-bold ph-floppy-disk text-xl sm:text-2xl"></i> Simpan & Publish Form
                                     </button>
-                                    <button onclick="copyEmbedCode()" class="flex-1 py-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-lg">
-                                        <i class="ph-bold ph-copy text-2xl"></i> Salin Kode HTML
+                                    <button onclick="savePersonalFormTemplate()" class="flex-1 py-4 bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold rounded-xl shadow-md border border-amber-200 transition flex items-center justify-center gap-2 text-sm sm:text-lg">
+                                        <i class="ph-bold ph-star text-xl sm:text-2xl"></i> Simpan Sebagai Template Saya
+                                    </button>
+                                    <button onclick="copyEmbedCode()" class="flex-1 py-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm sm:text-lg">
+                                        <i class="ph-bold ph-copy text-xl sm:text-2xl"></i> Salin HTML
                                     </button>
                                 </div>
                             </div>
@@ -1090,11 +1159,15 @@
         let savedForms = JSON.parse(localStorage.getItem('imersfow_forms')) || [];
         let currentStep = 1; 
         
-        // VARIABEL TEMPLATE ENGINE HIBRIDA
-        let availableTemplates = {};           // Untuk Template Form
-        let availableSequenceTemplates = {};   // Untuk Template Sequence WA
-        let currentModalType = 'form';         // 'form' atau 'sequence'
+        // VARIABEL TEMPLATE ENGINE HIBRIDA & CRM
+        let availableTemplates = {};           
+        let availableSequenceTemplates = {};   
+        let currentModalType = 'form';         
         let currentCategoryFilter = 'Semua';
+        
+        // Data Sinkronisasi CRM V4.0
+        let masterContactsData = [];
+        let campaignHistoryData = [];
 
         let sequencesData = [
             { 
@@ -1324,7 +1397,10 @@
                     updateSeqPreview();
                 }
             }
-            if(viewId === 'broadcast') toggleBcSource(); 
+            if(viewId === 'broadcast') {
+                syncCRMData(); // Tarik history dan master kontak
+                toggleBcSource(); 
+            }
         }
 
         // =========================================================================
@@ -1520,8 +1596,142 @@
         }
 
         // =========================================================================
-        // BROADCAST WA LOGIC (NEW)
+        // CAMPAIGN CENTER LOGIC (V4.0)
         // =========================================================================
+        function toggleCampaignView(viewType) {
+            if (viewType === 'create') {
+                document.getElementById('campaign-list-view').classList.add('hidden');
+                document.getElementById('campaign-create-view').classList.remove('hidden');
+                document.getElementById('btn-new-campaign').classList.add('hidden');
+            } else {
+                document.getElementById('campaign-create-view').classList.add('hidden');
+                document.getElementById('campaign-list-view').classList.remove('hidden');
+                document.getElementById('btn-new-campaign').classList.remove('hidden');
+                syncCRMData(); // Segarkan data jika batal buat campaign
+            }
+        }
+
+        async function syncCRMData() {
+            try {
+                // Tarik Histori Campaign
+                const resCmp = await fetchWithBackoff(SCRIPT_URL + "?action=get_campaign_history");
+                if (resCmp && resCmp.data) {
+                    campaignHistoryData = resCmp.data;
+                    renderCampaignHistory();
+                }
+                
+                // Tarik Master Kontak buat dropdown CRM
+                const resCtc = await fetchWithBackoff(SCRIPT_URL + "?action=get_master_contacts");
+                if (resCtc && resCtc.data) {
+                    masterContactsData = resCtc.data;
+                    renderCRMDropdown();
+                }
+            } catch(e) {
+                console.warn("Gagal sinkron CRM:", e);
+                showToast("Gagal menarik data CRM dari Google Sheets.");
+            }
+        }
+
+        function renderCampaignHistory() {
+            const tbody = document.getElementById('campaign-table-body');
+            const filterFolder = document.getElementById('filter-campaign-folder').value;
+            
+            // Populasikan dropdown folder dari history yang ada
+            const uniqueFolders = new Set(["ALL"]);
+            campaignHistoryData.forEach(c => {
+                if(c.folder) uniqueFolders.add(c.folder);
+            });
+            
+            const folderSelect = document.getElementById('filter-campaign-folder');
+            if (folderSelect.options.length !== uniqueFolders.size) {
+                folderSelect.innerHTML = '<option value="ALL">Semua Folder</option>';
+                uniqueFolders.forEach(f => {
+                    if(f !== "ALL") folderSelect.innerHTML += `<option value="${f}">${f}</option>`;
+                });
+                folderSelect.value = filterFolder;
+            }
+
+            tbody.innerHTML = '';
+            
+            let filteredData = campaignHistoryData;
+            if (filterFolder !== "ALL") {
+                filteredData = campaignHistoryData.filter(c => c.folder === filterFolder);
+            }
+            
+            // Urutkan: Favorite di atas, sisanya by Date (desc)
+            filteredData.sort((a, b) => {
+                if (a.isFavorite && !b.isFavorite) return -1;
+                if (!a.isFavorite && b.isFavorite) return 1;
+                return new Date(b.waktu) - new Date(a.waktu);
+            });
+
+            if(filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-slate-500 font-medium">Belum ada riwayat campaign di folder ini.</td></tr>`; 
+                return;
+            }
+
+            filteredData.forEach(cmp => {
+                const dateStr = new Date(cmp.waktu).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+                const starColor = cmp.isFavorite ? 'text-amber-500' : 'text-slate-300';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100 last:border-0">
+                        <td class="px-6 py-4 text-center text-lg ${starColor}">★</td>
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-slate-900">${cmp.name}</div>
+                            <div class="text-[10px] text-slate-500 mt-1">${dateStr}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium text-slate-600"><span class="bg-slate-100 px-2 py-1 rounded">${cmp.folder || '-'}</span></td>
+                        <td class="px-6 py-4 text-xs font-bold text-blue-600">${cmp.targetAudience}</td>
+                        <td class="px-6 py-4 text-center font-bold text-emerald-600">${cmp.totalKirim}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="cloneCampaign('${cmp.id}')" class="text-blue-600 hover:text-white font-bold bg-blue-50 hover:bg-blue-600 px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1 ml-auto">
+                                <i class="ph-bold ph-copy"></i> Clone
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function cloneCampaign(id) {
+            const cmp = campaignHistoryData.find(c => c.id === id);
+            if (!cmp) return;
+            
+            document.getElementById('bc-campaign-name').value = cmp.name + " (Clone)";
+            document.getElementById('bc-campaign-folder').value = cmp.folder || "";
+            document.getElementById('bc-campaign-fav').checked = cmp.isFavorite || false;
+            
+            document.getElementById('bc-media-url').value = cmp.mediaUrl || "";
+            document.getElementById('bc-editor').value = cmp.pesan || "";
+            
+            toggleCampaignView('create');
+            showToast("Campaign berhasil di-clone ke editor!");
+        }
+
+        function renderCRMDropdown() {
+            const select = document.getElementById('bc-crm-tag');
+            const currentVal = select.value;
+            
+            let uniqueTags = new Set();
+            masterContactsData.forEach(c => {
+                if (c.tags) {
+                    // split by comma and clean brackets
+                    const tList = c.tags.split(',').map(t => t.replace(/[\[\]]/g, '').trim()).filter(t => t);
+                    tList.forEach(t => uniqueTags.add(t));
+                }
+            });
+
+            select.innerHTML = '<option value="ALL">Semua Kontak di Database</option>';
+            uniqueTags.forEach(t => {
+                select.innerHTML += `<option value="${t}">Tag / Kategori: ${t}</option>`;
+            });
+            
+            if(uniqueTags.has(currentVal)) {
+                select.value = currentVal;
+            }
+        }
+
         function toggleBcSource() {
             const sourceEl = document.querySelector('input[name="bc_source"]:checked');
             if (!sourceEl) return;
@@ -1529,16 +1739,11 @@
             
             if(source === 'csv') {
                 document.getElementById('bc-source-csv-box').classList.remove('hidden');
-                document.getElementById('bc-source-form-box').classList.add('hidden');
+                document.getElementById('bc-source-crm-box').classList.add('hidden');
             } else {
                 document.getElementById('bc-source-csv-box').classList.add('hidden');
-                document.getElementById('bc-source-form-box').classList.remove('hidden');
-                
-                const select = document.getElementById('bc-form-target');
-                select.innerHTML = '<option value="">-- Pilih Form Target --</option>';
-                savedForms.forEach(f => {
-                    select.innerHTML += `<option value="${f.id}">${f.title} (${f.leads || 0} Leads)</option>`;
-                });
+                document.getElementById('bc-source-crm-box').classList.remove('hidden');
+                renderCRMDropdown();
             }
         }
 
@@ -1613,6 +1818,10 @@
         function insertBcStyle(char) { insertBcFormat(char); }
 
         async function processBroadcast() {
+            const campaignName = document.getElementById('bc-campaign-name').value.trim() || "Campaign " + new Date().toLocaleDateString('id-ID');
+            const campaignFolder = document.getElementById('bc-campaign-folder').value.trim() || "Uncategorized";
+            const isFav = document.getElementById('bc-campaign-fav').checked;
+
             const source = document.querySelector('input[name="bc_source"]:checked').value;
             const method = document.querySelector('input[name="bc_method"]:checked').value;
             const msgTemplate = document.getElementById('bc-editor').value;
@@ -1622,6 +1831,7 @@
             if(globalSettings.apiToken === "") return showToast("API Token belum di-setting! Silakan ke menu Integrasi API.");
             
             let contacts = [];
+            let audienceLabel = "";
             
             if (source === 'csv') {
                 const csvData = document.getElementById('bc-csv-data').value;
@@ -1648,17 +1858,31 @@
                         }
                     }
                 });
-            } else {
-                return showToast("Tarik form sedang disiapkan di backend V4.0. Gunakan mode Upload CSV!");
+                audienceLabel = "Upload CSV Manual";
+            } else if (source === 'crm') {
+                const selectedTag = document.getElementById('bc-crm-tag').value;
+                audienceLabel = selectedTag === 'ALL' ? "Semua Kontak Master" : `Tag: [${selectedTag}]`;
+                
+                masterContactsData.forEach(c => {
+                    if (selectedTag === 'ALL' || (c.tags && c.tags.includes(`[${selectedTag}]`))) {
+                        let phone = c.phone.toString().replace(/[^0-9]/g, '');
+                        if(phone.startsWith('0')) phone = '62' + phone.substring(1);
+                        
+                        if(phone.length >= 10) {
+                            let finalMsg = msgTemplate.replace(/\[Nama\]/gi, c.name || 'Kakak');
+                            contacts.push({ name: c.name || 'Kakak', phone: phone, message: finalMsg });
+                        }
+                    }
+                });
             }
             
-            if(contacts.length === 0) return showToast("Tidak ada nomor valid yang ditemukan!");
-            if(!confirm(`Anda akan mem-broadcast ke ${contacts.length} kontak dengan mode: ${method.toUpperCase()}.\nLanjutkan?`)) return;
+            if(contacts.length === 0) return showToast("Tidak ada nomor valid yang ditemukan sesuai kriteria target!");
+            if(!confirm(`Campaign "${campaignName}" akan dikirim ke ${contacts.length} kontak dengan mode: ${method.toUpperCase()}.\nLanjutkan?`)) return;
             
-            executeBroadcastAPI(contacts, method, mediaUrl);
+            await executeBroadcastAPI(contacts, method, mediaUrl, campaignName, campaignFolder, isFav, audienceLabel, msgTemplate);
         }
 
-        async function executeBroadcastAPI(contacts, method, mediaUrl) {
+        async function executeBroadcastAPI(contacts, method, mediaUrl, cmpName, cmpFolder, isFav, audienceLabel, msgTemplate) {
             const btn = document.getElementById('btn-bc-execute');
             const logBox = document.getElementById('bc-log-output');
             btn.disabled = true;
@@ -1671,7 +1895,7 @@
                 logBox.scrollTop = logBox.scrollHeight;
             };
 
-            addLog(`🚀 Memulai Broadcast ke ${contacts.length} target...`);
+            addLog(`🚀 Memulai Campaign '${cmpName}' ke ${contacts.length} target...`);
             if (mediaUrl) addLog(`📎 Terdapat lampiran URL Media.`);
 
             try {
@@ -1694,7 +1918,7 @@
                     const payload = {
                         action: "broadcast_bulk",
                         phones: phones,
-                        message: document.getElementById('bc-editor').value.replace(/\[Nama\]/gi, 'Kakak'),
+                        message: msgTemplate.replace(/\[Nama\]/gi, 'Kakak'),
                         mediaUrl: mediaUrl
                     };
                     
@@ -1738,6 +1962,26 @@
                     showToast("Live Broadcast selesai!");
                 }
 
+                // SIMPAN CAMPAIGN HISTORY KE GOOGLE SHEETS
+                addLog("💾 Menyimpan Riwayat Campaign ke Database...");
+                await fetchWithBackoff(SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        action: "save_campaign",
+                        campaign: {
+                            id: 'cmp_' + Date.now(),
+                            name: cmpName,
+                            folder: cmpFolder,
+                            isFavorite: isFav,
+                            targetAudience: audienceLabel,
+                            totalKirim: contacts.length,
+                            pesan: msgTemplate,
+                            mediaUrl: mediaUrl
+                        }
+                    })
+                });
+                addLog("✅ Riwayat Campaign berhasil diamankan!");
+
             } catch (err) {
                 addLog("Terjadi Kesalahan Kritis: " + err.message, true);
             } finally {
@@ -1746,6 +1990,56 @@
             }
         }
 
+
+        // =========================================================================
+        // PERSONAL ASSET LIBRARY LOGIC (V4.0)
+        // =========================================================================
+        async function savePersonalFormTemplate() {
+            showToast("Menyimpan template form pribadi ke Sheets...");
+            const tpl = {
+                id: 'tpl_' + Date.now(),
+                name: formConfig.title + ' (My Template)',
+                category: 'Template Pribadi',
+                icon: 'ph-star',
+                color: 'text-amber-500',
+                bg: 'bg-amber-50',
+                config: formConfig,
+                fields: formFields
+            };
+            
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "save_template", template: tpl })
+                });
+                setTimeout(() => showToast("Berhasil! Template pribadi telah tersimpan."), 1000);
+            } catch(e) {
+                showToast("Gagal menyimpan template pribadi.");
+            }
+        }
+
+        async function savePersonalSeqTemplate() {
+            showToast("Menyimpan template skenario ke Sheets...");
+            const selectTarget = document.getElementById('seq-form-target');
+            const formTitle = selectTarget && selectTarget.value ? savedForms.find(f => f.id === selectTarget.value)?.title : 'Sequence Baru';
+            
+            const tpl = {
+                id: 'seq_' + Date.now(),
+                name: formTitle + ' (My Sequence)',
+                category: 'Template Pribadi',
+                sequenceData: sequencesData
+            };
+            
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "save_sequence_template", template: tpl })
+                });
+                setTimeout(() => showToast("Berhasil! Skenario Sequence telah tersimpan sbg template."), 1000);
+            } catch(e) {
+                showToast("Gagal menyimpan skenario sequence.");
+            }
+        }
 
         // =========================================================================
         // SEQUENCE WA LOGIC
